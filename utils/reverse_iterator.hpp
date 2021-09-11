@@ -8,6 +8,7 @@ namespace	ft
 
 template<typename Iterator>
 class reverse_iterator
+	// : public iterator_traits<Iterator>
 	: public iterator<	iterator_traits<Iterator>::iterator_category,
 						iterator_traits<Iterator>::iterator_value_type,
 						iterator_traits<Iterator>::iterator_difference_type,
@@ -20,7 +21,7 @@ public:
 	reverse_iterator() : _iter() {};
 	template <typename U>
 	reverse_iterator(const reverse_iterator<U>& ref) { *this = ref; }
-	explicit reverse_iterator(iterator_type iter) : _iter(iter) {}
+	explicit reverse_iterator(iterator_type iter) : _iter(iter) {} /* to prevent  -> reverse_iterator rit = it */
 	~reverse_iterator() {}
 
 	template <typename U>
@@ -38,7 +39,7 @@ public:
 	reverse_iterator	operator+(difference_type	n) { reverse_iterator itr = (*this); return (itr -= n); }
 	reverse_iterator&	operator-=(difference_type	n) { _iter += n; return (*this); }
 	reverse_iterator	operator-(difference_type	n) { reverse_iterator itr = (*this); return (itr += n); }
-	reference			operator[](difference_type	n) const { return *(iter - n - 1); }
+	reference			operator[](difference_type	n) const { return *(_iter - n - 1); }
 	difference_type		operator-(reverse_iterator	other) { return (other._iter - _iter); }
 	// bool				operator<(reverse_iterator	other) { return (_iter > other._iter); }
 	// bool				operator>(reverse_iterator	other) { return (_iter < other._iter); }

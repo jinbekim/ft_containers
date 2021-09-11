@@ -5,11 +5,11 @@
 
 namespace ft
 {
-struct	input_iterator_tag {};
-struct	output_iterator_tag {};
-struct	forward_iterator_tag : public input_iterator_tag {};
-struct	bidirectional_iterator_tag : public forward_iterator_tag {};
-struct	random_access_iterator_tag : public bidirectional_iterator_tag {};
+struct	input_iterator_tag {/* identifying tag for input iterators */};
+struct	output_iterator_tag {/* identifying tag for output iterators */};
+struct	forward_iterator_tag : public input_iterator_tag, output_iterator_tag {/* identifying tag for forward iterators */};
+struct	bidirectional_iterator_tag : public forward_iterator_tag {/* identifying tag for bidrectional iterators */};
+struct	random_access_iterator_tag : public bidirectional_iterator_tag {/* identifying tag for random-access iterators */};
 
 template <	typename Iterator >
 struct	iterator_traits
@@ -54,6 +54,7 @@ struct	iterator
 	typedef Pointer		pointer;
 	typedef Reference	reference;
 };
+
 }
 
 #endif
