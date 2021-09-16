@@ -17,14 +17,14 @@ int main(int argc, char const *argv[])
 	cout << "capa :"  << v.capacity() <<endl;
 	cout << "size :"  << v.size() <<endl;
 
-	v.resize(1);
+	v.resize(5);
 	for(vector<int>::iterator it = v.begin(); it != v.end(); ++it)
 		cout << *it <<endl;
 
 	cout << "capa: " << v.capacity() <<endl;
 	cout << "size :"  << v.size() <<endl;
 
-	v.insert(v.begin(), 11, 4);
+	v.insert(v.begin(), 1000, 4);
 
 	cout << "capa: " << v.capacity() <<endl;
 	cout << "size :"  << v.size() <<endl;
@@ -36,3 +36,4 @@ int main(int argc, char const *argv[])
 	// cout << v.capacity() <<endl;
 	return 0;
 }
+
