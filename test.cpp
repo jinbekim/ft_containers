@@ -1,5 +1,6 @@
 #include <vector>
 // #include "vector.hpp"
+#include "stack.hpp"
 #include <list>
 #include <iostream>
 
@@ -53,16 +54,19 @@ node*	node::p() {return this->prev;}
 
 int main()
 {
-	vector<int> v(3,3);
-	v.reserve(5);
-	cout << "capa :"  << v.capacity() <<endl;
-	cout << "size :"  << v.size() <<endl;
-	v.insert(v.begin(), 3);
-	// v.push_back(3);
-	// v.push_back(3);
-	cout << "capa :"  << v.capacity() <<endl;
-	cout << "size :"  << v.size() <<endl;
+	// vector<int> v(3,3);
+	// v.reserve(5);
+	// cout << "capa :"  << v.capacity() <<endl;
+	// cout << "size :"  << v.size() <<endl;
+	// v.insert(v.begin(), 3);
+	// // v.push_back(3);
+	// // v.push_back(3);
+	// cout << "capa :"  << v.capacity() <<endl;
+	// cout << "size :"  << v.size() <<endl;
+	ft::stack<int> st1;
+	ft::stack<int> st2;
 
+	std::cout<< (st1 == st2) << std::endl;
 	// v.reserve(5);
 
 	// cout << "capa :"  << v.capacity() <<endl;

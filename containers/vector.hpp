@@ -337,7 +337,7 @@ template <class InputIterator>
 		return allocator_type();
 	}
 
-private:
+protected:
 	allocator_type		_alloc;
 	pointer				_start;
 	pointer				_end;
