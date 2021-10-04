@@ -7,9 +7,9 @@ int	main()
 {
 	strlist::iterator	it;
 	{
-		strlist	sv(4, "asfd");
-		NS::vector<strlist>	vec(4, sv);
-		it = vec.begin()->begin();
+	strlist	sv(4, "asfd");
+	NS::vector<strlist>	vec(4, sv);
+	it = vec.begin()->begin();
 	}
 	std::cout << *it << std::endl;
 	return (0);

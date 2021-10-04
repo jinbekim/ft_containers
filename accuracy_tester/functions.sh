@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-tested_path="../containers"
+tested_path="../containers -I./../utils"
 include_path="$tested_path"
 deepthought_dir="deepthought"
 log_dir="logs"

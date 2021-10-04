@@ -6,7 +6,7 @@ if [ $# -eq 0 ]; then
 fi
 
 if [ -z "$2" ]; then
-  INCLUDE_PATH="../containers";
+  INCLUDE_PATH="../containers -I./../utils";
 else
   INCLUDE_PATH="$2"
 fi

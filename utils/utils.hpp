@@ -125,26 +125,42 @@ template <class InputIterator1, class InputIterator2, class Compare>
 
 
 /* equal */
-// template <class InputIterator1, class InputIterator2>
-// 	bool equal (InputIterator1 first1, InputIterator1 last1, InputIterator2 first2)
-// 	{
-// 		while (first1!=last1) {
-// 			if (!(*first1 == *first2))
-// 				return false;
-// 			++first1; ++first2;
-// 		}
-// 		return true;
-// 	}
-// template <class InputIterator1, class InputIterator2, class BinaryPredicate>
-// 	bool equal (InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, BinaryPredicate pred)
-// 	{
-// 		while (first1!=last1) {
-// 			if (!pred(*first1,*first2))
-// 				return false;
-// 			++first1; ++first2;
-// 		}
-// 		return true;
-// 	}
+template <class InputIterator1, class InputIterator2>
+	bool equal (InputIterator1 first1, InputIterator1 last1, InputIterator2 first2)
+	{
+		while (first1!=last1) {
+			if (!(*first1 == *first2))
+				return false;
+			++first1; ++first2;
+		}
+		return true;
+	}
+template <class InputIterator1, class InputIterator2, class BinaryPredicate>
+	bool equal (InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, BinaryPredicate pred)
+	{
+		while (first1!=last1) {
+			if (!pred(*first1,*first2))
+				return false;
+			++first1; ++first2;
+		}
+		return true;
+	}
+
+
+template <class Arg1, class Arg2, class Result>
+	struct binary_function {
+		typedef	Arg1	first_argument_type;
+		typedef	Arg2	second_argument_type;
+		typedef	Result	result_type;
+	};
+
+/* less */
+template <class T>
+	struct less : binary_function <T, T, bool>
+	{
+		bool operator() (const T& x, const T& y) const { return x < y;}
+	};
+
 
 template< class T1, class T2 >
 struct pair
@@ -207,6 +223,89 @@ template <class T1, class T2>
 template <class T1, class T2>
 	bool operator>= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
 	{ return !(lhs<rhs); }
+
+
+/* red black tree node */
+enum Color
+{
+	BLACK,
+	RED
+};
+
+template<typename T>
+struct tree_node
+{
+public:
+	typedef T		value_type;
+	typedef Color	color_type;
+
+	value_type	value;
+	tree_node*	parent;
+	tree_node*	left;
+	tree_node*	right;
+	color_type	color;
+
+	tree_node()
+	:
+		value(),
+		parent(my_nullptr),
+		left(my_nullptr),
+		right(my_nullptr),
+		color(RED)
+	{}
+
+	// tree_node(tree_node* parent = my_nullptr,
+	// 			tree_node* left = my_nullptr,
+	// 			tree_node* right = my_nullptr)
+	// :
+	// 	value(),
+	// 	parent(parent),
+	// 	left(left),
+	// 	right(right),
+	// 	color(RED)
+	// {}
+
+	tree_node(const value_type& val, tree_node* parent = my_nullptr,
+				tree_node* left = my_nullptr, tree_node* right = my_nullptr)
+	:
+		value(val),
+		parent(parent),
+		left(left),
+		right(right),
+		color(RED)
+	{}
+
+	tree_node(const tree_node& other)
+	:
+		value(other.value),
+		parent(other.parent),
+		left(other.left),
+		right(other.right),
+		color(other.color)
+	{}
+
+	virtual ~tree_node() {}
+
+	tree_node& operator= (const tree_node& other)
+	{
+		if (this == &other)
+			return (*this);
+		this->value = other.value;
+		this->parent = other.parent;
+		this->left = other.left;
+		this->right = other.right;
+		this->color = other.color;
+		return (*this);
+	}
+
+	bool operator==(const tree_node& other)
+	{
+		if (this->value == other.value)
+			return (true);
+		return (false);
+	}
+};
+
 }
 
 #endif

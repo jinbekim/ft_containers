@@ -55,7 +55,8 @@ public:
 // range (3)
 template <class InputIterator>
 	vector (InputIterator first, InputIterator last,
-			const allocator_type& alloc = allocator_type())
+			const allocator_type& alloc = allocator_type(),
+			typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = my_nullptr)
 	:
 		_alloc(alloc),
 		_start(my_nullptr),
@@ -240,7 +241,7 @@ template <class InputIterator>
 		if (this->capacity() * 2 < nec_size)
 			new_start = _alloc.allocate(nec_size);
 		else
-			new_start = _alloc.allocate(this->size() * 2);
+			new_start = _alloc.allocate(this->capacity() * 2);
 		for (size_type i = 0; i < pos; ++i)
 		{
 			_alloc.construct(new_start, *(_start + i));
@@ -274,14 +275,14 @@ template <class InputIterator>
 		if (this->capacity() * 2 < nec_size)
 			new_start = _alloc.allocate(nec_size);
 		else
-			new_start = _alloc.allocate(this->size() * 2);
+			new_start = _alloc.allocate(this->capacity() * 2);
 		for (size_type i = 0; i < pos; ++i)
 		{
 			_alloc.construct(new_start, *(_start + i));
 			_alloc.destroy(_start + i);
 		}
 		for (size_type i = 0; i < num; ++i)
-			_alloc.construct(new_start + pos + i, *(&*first + i));
+			_alloc.construct(new_start + pos + i, *(&*first++));
 		for (size_type i = 0; i < this->size() - pos; ++i)
 		{
 			_alloc.construct(new_start + pos + num + i, *(_start + pos + i));
