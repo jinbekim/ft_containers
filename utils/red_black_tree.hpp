@@ -211,52 +211,109 @@ private:
 	}
 	void	deleteValue(value_type val)
 	{
-		node_ptr node = deleteNode(_root, val);
-		fixAftreDelete(node);
+		node_ptr node = findNode(_root, val);
+		node_ptr child = node->right;
+		if (child == my_nullptr)
+			child = node->left;
+		if(child != my_nullptr)
+			child->parent = node->parent;
+		if (getColor(node) == BLACK) {
+			if (getColor(child) == RED)
+				setColor(child, BLACK);
+			else
+				delete_case1(child);
+		}
+		_node_alloc.destroy(node);
+		_node_alloc.deallocate(node, 1);
 	}
-	node_ptr	deleteNode(node_ptr node, value_type val)
+	node_ptr	findNode(node_ptr node, value_type val)
 	{
 		if (node == my_nullptr)
 			return node;
 		if (node->value < val)
-			return deleteNode(node->right, val);
+			return findNode(node->right, val);
 		if (node->value > val)
-			return deleteNode(node->left, val);
+			return findNode(node->left, val);
 		if (node->left == my_nullptr || node->right == my_nullptr)
 			return node;
 		node_ptr tmp = minValueNode(node->right);
 		node->value = tmp->value;
-		return deleteNode(node->right, tmp->value);
+		return findNode(node->right, tmp->value);
 	}
-	void	fixAftreDelete(node_ptr node)
+	void	delete_case1(node_ptr node)
 	{
-		if (node == my_nullptr)
-			return;
-		if (node == _root) {
-			this->_root = my_nullptr;
-			return;
-		}
-		if (getColor(node) == RED || getColor(node->left) == RED || getColor(node->right) == RED) {
-			node_ptr	child = node->left;
-			if (child == my_nullptr)
-				child = node->right;
-			if (node == node->parent->left)
-				node->parent->left = child;
+		if (node->parent != my_nullptr)
+			delete_case2(node);
+	}
+	void	delete_case2(node_ptr node)
+	{
+		node_ptr sibling = getSibling(node);
+		if (getColor(sibling) == RED) {
+			std::swap(node->parent->color, sibling->color);
+			if (node->parent->left == node)
+				rotateLeft(node->parent);
 			else
-				node->parent->right = child;
-			if(child != my_nullptr)
-					child->parent = node->parent;
-			setColor(child, BLACK);
-			_node_alloc.destroy(node);
-			_node_alloc.deallocate(node, 1);
-			node->parent->right = child;
+				rotateRight(node->parent);
+		}
+		delete_case3(node);
+	}
+	void	delete_case3(node_ptr node)
+	{
+		node_ptr sibling = getSibling(node);
+		if (getColor(node->parent) == BLACK &&
+			getColor(sibling) == BLACK &&
+			getColor(sibling->left) == BLACK &&
+			getColor(sibling->right) == BLACK) {
+			setColor(sibling, RED);
+			delete_case1(node->parent);
 		} else {
-			node_ptr	sibling = my_nullptr;
-			node_ptr	parent = my_nullptr;
-			node_ptr	sibling = my_nullptr;
+			delete_case4(node);
 		}
 	}
-
+	void	delete_case4(node_ptr node)
+	{
+		node_ptr sibling = getSibling(node);
+		if (getColor(node->parent) == RED &&
+			getColor(sibling) == BLACK &&
+			getColor(sibling->left) == BLACK &&
+			getColor(sibling->right) == BLACK) {
+			setColor(sibling, RED);
+			setColor(node->parent, BLACK);
+		} else {
+			delete_case5(node);
+		}
+	}
+	void	delete_case5(node_ptr node)
+	{
+		node_ptr sibling = getSibling(node);
+		if (getColor(sibling) == BLACK) {
+			if (node == node->parent->left &&
+				getColor(sibling->right) == BLACK &&
+				getColor(sibling->left) == RED) {
+				std::swap(sibling->color, sibling->left->color);
+				rotateRight(sibling);
+			} else if (node == node->parent->right &&
+				getColor(sibling->left) == BLACK &&
+				getColor(sibling->right) == RED) {
+				std::swap(sibling->color, sibling->right->color);
+				rotateLeft(sibling);
+			}
+		}
+		delete_case6(node);
+	}
+	void	delete_case6(node_ptr node)
+	{
+		node_ptr sibling = getSibling(node);
+		setColor(sibling, node->parent->color);
+		setColor(node->parent, BLACK);
+		if (node == node->parent->left) {
+			setColor(sibling->right, BLACK);
+			rotateLeft(node->parent);
+		} else {
+			setColor(sibling->left, BLACK);
+			rotateRight(node->parent);
+		}
+	}
 };
 }
 #endif

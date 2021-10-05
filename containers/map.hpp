@@ -42,7 +42,6 @@ public:
 		}
 	};
 
-
 	explicit map (const key_compare& comp = key_compare(),
 	const allocator_type& alloc = allocator_type())
 	:
