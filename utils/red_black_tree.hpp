@@ -14,7 +14,7 @@ class red_black_tree
 private:
 	typedef	red_black_tree										rbtree;
 	typedef	ft::tree_node<T>									node_type;
-	typedef	ft::tree_node<T>*									node_ptr;
+	typedef	ft::tree_node<T>*									node_pointer;
 	typedef	typename Alloc::template rebind<node_type>::other	node_alloc_type;
 public:
 
@@ -27,40 +27,68 @@ public:
 	typedef	typename allocator_type::const_reference			const_reference;
 	typedef	typename allocator_type::pointer					pointer;
 	typedef	typename allocator_type::const_pointer				const_pointer;
-	typedef	ft::tree_iterator<Node, Compare>					iterator;
-	typedef	ft::tree_const_iterator<Node, Compare>				const_iterator;
+	typedef	ft::tree_iterator<value_type, Compare>				iterator;
+	typedef	ft::tree_iterator<const value_type, Compare>		const_iterator;
 	typedef	reverse_iterator<iterator>							reverse_iterator;
 	typedef	reverse_iterator<const_iterator>					const_reverse_iterator;
 
 
 	red_black_tree()
 	:
-		_root(my_nullptr),
+		_meta_node(),
 		_node_alloc(),
-		_comp()
+		_comp(),
+		_size()
 	{}
 	red_black_tree(const red_black_tree &ref)
 	:
-		_root(ref._root),
+		_meta_node(ref._meta_node),
 		_node_alloc(ref._node_alloc),
-		_comp(ref._comp)
+		_comp(ref._comp),
+		_size(ref._size)
 	{}
 	~red_black_tree() {}
 	red_black_tree& operator=(const red_black_tree &ref)
 	{
-		this->_root = ref._root;
+		this->_meta_node = ref._meta_node;
 		this->_node_alloc = ref._node_alloc;
 		this->_comp = ref._comp;
+		this->_size = ref._size;
+	}
+// Iterators:
+// Capacity:
+	bool empty() const { return (this->_meta_node->left == my_nullptr); }
+	size_type size() const ( return (this->_size); )
+	size_type max_size() const { return (_node_alloc.max_size()); }
+// Element access:
+// Modifiers:
+// Observers:
+// Operations:
+	iterator							find (const key_type& k)
+	{
+		node_pointer	tmp = this->_meta_node->left;
+		while (tmp != my_nullptr) {
+			if (tmp->value->first == k)
+				break;
+			else if (tmp->value->first < k)
+				tmp = tmp->right;
+			else
+				tmp = tmp->left;
+		}
+		if (tmp == my_nullptr)
+			return (this->end());
+		return (iterator(tmp));
 	}
 
 private:
-	node_ptr		_root;
+	node_pointer	_meta_node;
 	node_alloc_type	_node_alloc;
 	value_compare	_comp;
+	size_type		_size;
 
-	void	rotateLeft(node_ptr node)
+	void	rotateLeft(node_pointer node)
 	{
-		node_ptr	rightChild = node->right;
+		node_pointer	rightChild = node->right;
 		if (rightChild == my_nullptr)
 			return;
 		node->right = rightChild->left;
@@ -76,9 +104,9 @@ private:
 		rightChild->left = node;
 		node->parent = rightChild;
 	}
-	void	rotateRight(node_ptr node)
+	void	rotateRight(node_pointer node)
 	{
-		node_ptr	leftChild = node->left;
+		node_pointer	leftChild = node->left;
 		if (leftChild == my_nullptr)
 			return;
 		node->left = leftChild->right;
@@ -94,53 +122,14 @@ private:
 		leftChild->right = node;
 		node->parent = leftChild;
 	}
-	node_ptr	getParent(node_ptr node)
-	{
-		return (node->parent);
-	}
-	node_ptr	getGrandparent(node_ptr node)
-	{
-		node_ptr pr = getParent(node);
-		if (pr == my_nullptr)
-			return (my_nullptr);
-		return (getParent(pr));
-	}
-	node_ptr	getSibling(node_ptr node)
-	{
-		node_ptr	pr = getParent(node);
-		if (pr == my_nullptr)
-			return (my_nullptr);
-		if (node == pr->left)
-			return (pr->right);
-		return (pr->right);
-	}
-	node_ptr	getUncle(node_ptr node)
-	{
-		node_ptr	pr = getParent(node);
-		if (pr == my_nullptr)
-			return (my_nullptr);
-		return (getSibling(pr));
-	}
-	Color	getColor(node_ptr node)
-	{
-		if (node == my_nullptr)
-			return (BLACK);
-		return (node->color);
-	}
-	void	setColor(node_ptr node, Color color)
-	{
-		if (node == my_nullptr)
-			return;
-		node->color = color;
-	}
 	void	insertValue(value_type val)
 	{
-		node_ptr	node = _node_alloc.allocate(1);
+		node_pointer	node = _node_alloc.allocate(1);
 		_node_alloc.construct(node->value, tree_node(val));
 		_root = insertNode(_root, node);
 		fixAfterInsert(node);
 	}
-	node_ptr	insertNode(node_ptr root, node_ptr node)
+	node_pointer	insertNode(node_pointer root, node_pointer node)
 	{
 		if (root == my_nullptr)
 			return (node);
@@ -155,9 +144,9 @@ private:
 		}
 		return (root);
 	}
-	void	fixAfterInsert(node_ptr node)
+	void	fixAfterInsert(node_pointer node)
 	{
-		node_ptr	parent, grandparent;
+		node_pointer	parent, grandparent;
 
 		while (node != this->_root && getColor(node) == RED && getColor(node->parent) == RED)
 		{
@@ -165,7 +154,7 @@ private:
 			grandparent = getGrandparent(node);
 			if (grandparent == my_nullptr)
 				break;
-			node_ptr	uncle = getUncle(node);
+			node_pointer	uncle = getUncle(node);
 			if (getColor(uncle) == RED) { // 삼촌이 red인 경우, 반복.
 				setColor(parent, BLACK);
 				setColor(uncle, BLACK);
@@ -193,26 +182,10 @@ private:
 		}
 		setColor(_root, BLACK);
 	}
-	node_ptr	minValueNode(node_ptr node)
-	{
-		if (node == my_nullptr)
-			return (node);
-		while (node->left != my_nullptr)
-			node = node->left;
-		return (node);
-	}
-	node_ptr	maxValueNode(node_ptr node)
-	{
-		if (node == my_nullptr)
-			return (node);
-		while (node->right != my_nullptr)
-			node = node->right;
-		return (node);
-	}
 	void	deleteValue(value_type val)
 	{
-		node_ptr node = findNode(_root, val);
-		node_ptr child = node->right;
+		node_pointer node = findNode(_root, val);
+		node_pointer child = node->right;
 		if (child == my_nullptr)
 			child = node->left;
 		if(child != my_nullptr)
@@ -226,7 +199,7 @@ private:
 		_node_alloc.destroy(node);
 		_node_alloc.deallocate(node, 1);
 	}
-	node_ptr	findNode(node_ptr node, value_type val)
+	node_pointer	findNode(node_pointer node, value_type val)
 	{
 		if (node == my_nullptr)
 			return node;
@@ -236,18 +209,18 @@ private:
 			return findNode(node->left, val);
 		if (node->left == my_nullptr || node->right == my_nullptr)
 			return node;
-		node_ptr tmp = minValueNode(node->right);
+		node_pointer tmp = minValueNode(node->right);
 		node->value = tmp->value;
 		return findNode(node->right, tmp->value);
 	}
-	void	delete_case1(node_ptr node)
+	void	delete_case1(node_pointer node)
 	{
 		if (node->parent != my_nullptr)
 			delete_case2(node);
 	}
-	void	delete_case2(node_ptr node)
+	void	delete_case2(node_pointer node)
 	{
-		node_ptr sibling = getSibling(node);
+		node_pointer sibling = getSibling(node);
 		if (getColor(sibling) == RED) {
 			std::swap(node->parent->color, sibling->color);
 			if (node->parent->left == node)
@@ -257,9 +230,9 @@ private:
 		}
 		delete_case3(node);
 	}
-	void	delete_case3(node_ptr node)
+	void	delete_case3(node_pointer node)
 	{
-		node_ptr sibling = getSibling(node);
+		node_pointer sibling = getSibling(node);
 		if (getColor(node->parent) == BLACK &&
 			getColor(sibling) == BLACK &&
 			getColor(sibling->left) == BLACK &&
@@ -270,9 +243,9 @@ private:
 			delete_case4(node);
 		}
 	}
-	void	delete_case4(node_ptr node)
+	void	delete_case4(node_pointer node)
 	{
-		node_ptr sibling = getSibling(node);
+		node_pointer sibling = getSibling(node);
 		if (getColor(node->parent) == RED &&
 			getColor(sibling) == BLACK &&
 			getColor(sibling->left) == BLACK &&
@@ -283,9 +256,9 @@ private:
 			delete_case5(node);
 		}
 	}
-	void	delete_case5(node_ptr node)
+	void	delete_case5(node_pointer node)
 	{
-		node_ptr sibling = getSibling(node);
+		node_pointer sibling = getSibling(node);
 		if (getColor(sibling) == BLACK) {
 			if (node == node->parent->left &&
 				getColor(sibling->right) == BLACK &&
@@ -301,9 +274,9 @@ private:
 		}
 		delete_case6(node);
 	}
-	void	delete_case6(node_ptr node)
+	void	delete_case6(node_pointer node)
 	{
-		node_ptr sibling = getSibling(node);
+		node_pointer sibling = getSibling(node);
 		setColor(sibling, node->parent->color);
 		setColor(node->parent, BLACK);
 		if (node == node->parent->left) {

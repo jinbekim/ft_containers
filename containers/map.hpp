@@ -95,13 +95,9 @@ template <class InputIterator>
 // Return reverse iterator to reverse end (public member function )
 
 // Capacity:
-// empty
-// Test whether container is empty (public member function )
-// size
-// Return container size (public member function )
-// max_size
-// Return maximum size (public member function )
-size_type max_size() const { return (_tree.max_size()); }
+	bool empty() const { return (this->_tree.empty()); }
+	size_type size() const ( return (this->_tree.size()); )
+	size_type max_size() const { return (_tree.max_size()); }
 
 
 // Element access:
@@ -111,6 +107,13 @@ size_type max_size() const { return (_tree.max_size()); }
 // Modifiers:
 // insert
 // Insert elements (public member function )
+	pair<iterator,bool> insert (const value_type& val)
+	{
+
+	}
+	iterator insert (iterator position, const value_type& val);
+template <class InputIterator>
+	void insert (InputIterator first, InputIterator last);
 // erase
 // Erase elements (public member function )
 // swap
@@ -125,20 +128,44 @@ size_type max_size() const { return (_tree.max_size()); }
 // Return value comparison object (public member function )
 
 // Operations:
-// find
-// Get iterator to element (public member function )
-// count
-// Count elements with a specific key (public member function )
-	iterator		lower_bound (const key_type& k) { return (_tree.lower_bound(k)); }
-	const_iterator	lower_bound (const key_type& k) const { return (_tree.lower_bound(k)); }
-	iterator		upper_bound (const key_type& k) { return (_tree.upper_bound(k)); }
-	const_iterator	upper_bound (const key_type& k) const { return (_tree.upper_bound(k)); }
-// equal_range
-// Get range of equal elements (public member function )
+	iterator							find (const key_type& k) { return (_tree.find(k)); }
+	const_iterator						find (const key_type& k) const { return (_tree.find(k)); }
+	size_type							count (const key_type& k) const;
+	iterator							lower_bound (const key_type& k)
+	{
+		iterator	it1 = this->begin();
+		iterator	it2 = this->end();
+		while (it1 != it2)
+		{
+			if (_comp(it1->first, k) == false)
+				break;
+			++it1;
+		}
+		return (it1);
+	}
+	iterator							upper_bound (const key_type& k)
+	{
+		iterator	it1 = this->begin();
+		iterator	it2 = this->end();
+		while (it1 != it2)
+		{
+			if (_comp(k, it1->first) == true)
+				break;
+			++it1;
+		}
+		return (it1);
+	}
+	const_iterator						lower_bound (const key_type& k) const
+	{ return (const_iterator(lower_bound(k))); }
+	const_iterator						upper_bound (const key_type& k) const
+	{ return (const_iterator(upper_bound(k))); }
+	pair<const_iterator,const_iterator>	equal_range (const key_type& k) const
+	{ return (ft::make_pair(this->lower_bound(k), this->upper_bound(k))); }
+	pair<iterator,iterator>				equal_range (const key_type& k)
+	{ return (ft::make_pair(this->lower_bound(k), this->upper_bound(k))); }
+	allocator_type 						get_allocator() const
+	{ return (allocator_type()); }
 
-// Allocator:
-// get_allocator
-// Get allocator (public member function )
 
 private:
 	key_compare								_comp;
