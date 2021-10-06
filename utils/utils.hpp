@@ -173,8 +173,8 @@ struct pair
 
 	pair()
 	:
-		first(),
-		second()
+		first(0),
+		second(0)
 	{}
 template<class U, class V>
 	pair (const pair<U,V>& pr)

@@ -1,7 +1,8 @@
 #ifndef RED_BLACK_TREE_HPP
 #define RED_BLACK_TREE_HPP
 
-#include "iterator.hpp"
+#include "tree_iterator.hpp"
+#include "reverse_iterator.hpp"
 #include "utils.hpp"
 #include <memory>
 
@@ -23,68 +24,158 @@ public:
 	typedef	Alloc												allocate_type;
 	typedef	size_t												size_type;
 	typedef	ptrdiff_t											difference_type;
-	typedef	typename allocator_type::reference					reference;
-	typedef	typename allocator_type::const_reference			const_reference;
-	typedef	typename allocator_type::pointer					pointer;
-	typedef	typename allocator_type::const_pointer				const_pointer;
-	typedef	ft::tree_iterator<value_type, Compare>				iterator;
-	typedef	ft::tree_iterator<const value_type, Compare>		const_iterator;
-	typedef	reverse_iterator<iterator>							reverse_iterator;
-	typedef	reverse_iterator<const_iterator>					const_reverse_iterator;
+	typedef	typename allocate_type::reference					reference;
+	typedef	typename allocate_type::const_reference				const_reference;
+	typedef	typename allocate_type::pointer						pointer;
+	typedef	typename allocate_type::const_pointer				const_pointer;
+	typedef	ft::tree_iterator<value_type>						iterator;
+	typedef	ft::tree_iterator<const value_type>					const_iterator;
+	typedef	ft::reverse_iterator<iterator>							reverse_iterator;
+	typedef	ft::reverse_iterator<const_iterator>					const_reverse_iterator;
 
 
 	red_black_tree()
 	:
-		_meta_node(),
-		_node_alloc(),
-		_comp(),
-		_size()
-	{}
+		_root(my_nullptr),
+		_node_alloc(node_alloc_type()),
+		_comp(value_compare()),
+		_end_node(my_nullptr),
+		_size(0)
+	{
+		this->_end_node = _node_alloc.allocate(1);
+		_node_alloc.construct(_end_node, node_type());
+	}
 	red_black_tree(const red_black_tree &ref)
 	:
-		_meta_node(ref._meta_node),
+		_root(ref._root),
 		_node_alloc(ref._node_alloc),
 		_comp(ref._comp),
+		_end_node(ref._end_node),
 		_size(ref._size)
 	{}
-	~red_black_tree() {}
+	~red_black_tree()
+	{
+		this->clear();
+		_node_alloc.destroy(_end_node);
+		_node_alloc.deallocate(_end_node, 1);
+	}
 	red_black_tree& operator=(const red_black_tree &ref)
 	{
-		this->_meta_node = ref._meta_node;
+		this->_root = ref._root;
 		this->_node_alloc = ref._node_alloc;
 		this->_comp = ref._comp;
+		this->_end_node = ref._end_node;
 		this->_size = ref._size;
 	}
 // Iterators:
+	iterator				begin(){ return (iterator(minValueNode(_root), _end_node)); }
+	const_iterator			begin() const  { return (const_iterator(minValueNode(_root), _end_node)); }
+	iterator				end() { return (iterator(_end_node, _end_node)); }
+	const_iterator			end() const { return (const_iterator(_end_node, _end_node)); }
+	reverse_iterator		rbegin() { return (reverse_iterator(begin())); }
+	const_reverse_iterator	rbegin() const { return (const_reverse_iterator(begin())); }
+	reverse_iterator		rend() { return (reverse_iterator(end())); }
+	const_reverse_iterator	rend() const { return (const_reverse_iterator(end())); }
 // Capacity:
-	bool empty() const { return (this->_meta_node->left == my_nullptr); }
-	size_type size() const ( return (this->_size); )
-	size_type max_size() const { return (_node_alloc.max_size()); }
-// Element access:
+	bool					empty() const { return (this->_size == 0); }
+	size_type				size() const { return (this->_size); }
+	size_type				max_size() const { return (_node_alloc.max_size()); }
 // Modifiers:
-// Observers:
-// Operations:
-	iterator							find (const key_type& k)
+	pair<iterator,bool>		insert (const value_type& val)
+	{ return (insertValue(val)); }
+	iterator				insert (iterator position, const value_type& val)
 	{
-		node_pointer	tmp = this->_meta_node->left;
+		(void)position;
+		return (insertValue(val)->first);
+	}
+template <class InputIterator>
+	void					insert (InputIterator first, InputIterator last)
+	{
+		while (first != last) {
+			this->insert(first->value);
+			++first;
+		}
+	}
+	void					erase (iterator position) { return (deleteValue(*position)); }
+	size_type				erase (const value_type& k) { return (deleteValue(k)); }
+	void					erase (iterator first, iterator last)
+	{
+		for (iterator it = first; first != last; ++it)
+			erase(it);
+	}
+	void swap (rbtree& x)
+	{
+		if (this == &x)
+			return;
+		node_pointer	tmp_root = x._root;
+		node_alloc_type	tmp_node_alloc = x._node_alloc;
+		value_compare	tmp_comp = x._comp;
+		node_pointer	tmp_end_node = x._end_node;
+		size_type		tmp_size = x._size;
+
+		x._root = this->_root;
+		x._node_alloc = this->_node_alloc;
+		x._comp = this->_comp;
+		x._end_node = this->_end_node;
+		x._size = this->_size;
+
+		this->_root = tmp_root;
+		this->_node_alloc = tmp_node_alloc;
+		this->_comp = tmp_comp;
+		this->_end_node = tmp_end_node;
+		this->_size = tmp_size;
+	}
+	void clear()
+	{
+		deleteTree(_root);
+		this->_root = my_nullptr;
+		this->_size = 0;
+	}
+	iterator	find (const value_type& k)
+	{
+		node_pointer	tmp = this->_root;
 		while (tmp != my_nullptr) {
-			if (tmp->value->first == k)
+			if (tmp->value->first == k.first)
 				break;
-			else if (tmp->value->first < k)
+			else if (_comp(tmp->value->first, k.first))
 				tmp = tmp->right;
 			else
 				tmp = tmp->left;
 		}
 		if (tmp == my_nullptr)
-			return (this->end());
-		return (iterator(tmp));
+			return (iterator(this->_end_node, this->_end_node));
+		return (iterator(tmp, this->_end_node));
+	}
+	size_type	count (const value_type& k) const
+	{
+		iterator	tmp = find(k);
+		if (tmp->_end_node == tmp->_node)
+			return (0);
+		size_type	count = 0;
+		for (iterator it = tmp; it != _end_node; ++it) {
+			if (it->first == k.first)
+				++count;
+		}
+		return (count);
 	}
 
 private:
-	node_pointer	_meta_node;
+	node_pointer	_root;
 	node_alloc_type	_node_alloc;
 	value_compare	_comp;
+	node_pointer	_end_node;
 	size_type		_size;
+
+
+	void	deleteTree(node_pointer node)
+	{
+		if (node == my_nullptr)
+			return;
+		deleteTree(node->left);
+		deleteTree(node->right);
+		_node_alloc.destroy(node);
+		_node_alloc.deallocate(node, 1);
+	}
 
 	void	rotateLeft(node_pointer node)
 	{
@@ -122,27 +213,95 @@ private:
 		leftChild->right = node;
 		node->parent = leftChild;
 	}
-	void	insertValue(value_type val)
+	node_pointer	minValueNode(node_pointer node)
+	{
+		if (node == my_nullptr)
+			return (node);
+		while (node->left != my_nullptr)
+			node = node->left;
+		return (node);
+	}
+	node_pointer	maxValueNode(node_pointer node)
+	{
+		if (node == my_nullptr)
+			return (node);
+		while (node->right != my_nullptr)
+			node = node->right;
+		return (node);
+	}
+	node_pointer	getParent(node_pointer node)
+	{
+		return (node->parent);
+	}
+	node_pointer	getGrandparent(node_pointer node)
+	{
+		node_pointer pr = getParent(node);
+		if (pr == my_nullptr)
+			return (my_nullptr);
+		return (getParent(pr));
+	}
+	node_pointer	getSibling(node_pointer node)
+	{
+		node_pointer	pr = getParent(node);
+		if (pr == my_nullptr)
+			return (my_nullptr);
+		if (node == pr->left)
+			return (pr->right);
+		return (pr->right);
+	}
+	node_pointer	getUncle(node_pointer node)
+	{
+		node_pointer	pr = getParent(node);
+		if (pr == my_nullptr)
+			return (my_nullptr);
+		return (getSibling(pr));
+	}
+	Color	getColor(node_pointer node)
+	{
+		if (node == my_nullptr)
+			return (BLACK);
+		return (node->color);
+	}
+	void	setColor(node_pointer node, Color color)
+	{
+		if (node == my_nullptr)
+			return;
+		node->color = color;
+	}
+	pair<iterator,bool>	insertValue(value_type val)
 	{
 		node_pointer	node = _node_alloc.allocate(1);
-		_node_alloc.construct(node->value, tree_node(val));
-		_root = insertNode(_root, node);
-		fixAfterInsert(node);
-	}
-	node_pointer	insertNode(node_pointer root, node_pointer node)
-	{
-		if (root == my_nullptr)
-			return (node);
-		if (root->value > node->value)
-		{
-			root->left = insertNode(root->left, node);
-			root->left->parent = root;
-		} else if (root->value < node->value)
-		{
-			root->right = insertNode(root->right, node);
-			root->right->parent = root;
+		_node_alloc.construct(node->value, node_type(val));
+		pair<iterator,bool> ret = insertNode(node);
+		if (ret->second == false) {
+			_node_alloc.destroy(node);
+			_node_alloc.deallocate(node, 1);
+		} else {
+			this->_size++;
+			fixAfterInsert(node);
 		}
-		return (root);
+		return (ret);
+	}
+	pair<iterator,bool>	insertNode(node_pointer node)
+	{
+		node_pointer tmp = _root;
+		if (_root == my_nullptr) {
+			this->_root = node;
+			return (ft::make_pair(iterator(node, _end_node), true));
+		}
+		while (tmp) {
+			if (_comp(tmp->value, node->value))
+				tmp = tmp->right;
+			else if (_comp(node->value, tmp->value))
+				tmp = tmp->left;
+			else
+				return (ft::make_pair(iterator(tmp, _end_node), false));
+		}
+		if (_comp(getParent(tmp)->value, node->value))
+			tmp->parent->right = node;
+		else
+			tmp->parent->left = node;
+		return (ft::make_pair(iterator(node, _end_node), true));
 	}
 	void	fixAfterInsert(node_pointer node)
 	{
@@ -185,6 +344,8 @@ private:
 	void	deleteValue(value_type val)
 	{
 		node_pointer node = findNode(_root, val);
+		if (node == my_nullptr)
+			return;
 		node_pointer child = node->right;
 		if (child == my_nullptr)
 			child = node->left;
@@ -198,14 +359,15 @@ private:
 		}
 		_node_alloc.destroy(node);
 		_node_alloc.deallocate(node, 1);
+		this->_size--;
 	}
 	node_pointer	findNode(node_pointer node, value_type val)
 	{
 		if (node == my_nullptr)
 			return node;
-		if (node->value < val)
+		if (_comp(node->value, val))
 			return findNode(node->right, val);
-		if (node->value > val)
+		if (_comp(val, node->value))
 			return findNode(node->left, val);
 		if (node->left == my_nullptr || node->right == my_nullptr)
 			return node;
