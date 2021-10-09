@@ -9,11 +9,11 @@ int main()
 	{
 		t = clock();
 		for (int i = 0; i < 1000; ++i)
-			ft::set<ft::set<ft::set<ft::set<std::string> > > > ft;
+			ft::set<std::string> ft;
 		ft_time = clock() - t;
 		t = clock();
 		for (int i = 0; i < 1000; ++i)
-			std::set<std::set<std::set<std::set<std::string> > > > std;
+			std::set<std::string> std;
 		std_time = clock() - t;
 		efficiency_output(ft_time, std_time);
 	}
