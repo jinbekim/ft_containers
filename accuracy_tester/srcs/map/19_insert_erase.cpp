@@ -38,16 +38,15 @@ int	main()
 	std::cout << "\n\nErase test\n";
 
 	mapIntStr	map2(map1);
-
 	it = map1.begin();
 	map1.erase(it);
 	print_map(map1);
 
 	map1.erase(3);
 	print_map(map1);
-
 	map1.erase(map1.begin(), map1.end());
 	print_map(map1);
+
 
 	map2.erase(++map2.begin(), --map2.end());
 	print_map(map2);

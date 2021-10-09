@@ -56,7 +56,7 @@ public:
 template <class InputIterator>
 	vector (InputIterator first, InputIterator last,
 			const allocator_type& alloc = allocator_type(),
-			typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = my_nullptr)
+			typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = my_nullptr)
 	:
 		_alloc(alloc),
 		_start(my_nullptr),
@@ -165,7 +165,7 @@ template <class InputIterator>
 // Modifiers:
 template <class InputIterator>
 	void	assign (InputIterator first, InputIterator last,
-	typename ft::enable_if<!is_integral<InputIterator>::value, InputIterator>::type* = my_nullptr)
+	typename ft::enable_if<!is_integral<InputIterator>::value>::type* = my_nullptr)
 	{
 		// if (!ft::is_input_iter<ft::iterator_traits<InputIterator>::iterator_category>::value)
 		this->clear();
@@ -261,7 +261,7 @@ template <class InputIterator>
 	}
 template <class InputIterator>
 	void insert (iterator position, InputIterator first, InputIterator last,
-	typename ft::enable_if<!is_integral<InputIterator>::value, InputIterator>::type* = my_nullptr)
+	typename ft::enable_if<!is_integral<InputIterator>::value>::type* = my_nullptr)
 	{
 		if (position > this->end() || position < this->begin())
 			return;

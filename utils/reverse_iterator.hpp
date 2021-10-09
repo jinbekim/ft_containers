@@ -2,6 +2,7 @@
 # define REVERSE_ITERATOR_HPP
 
 #include "iterator.hpp"
+#include "tree_iterator.hpp"
 
 namespace	ft
 {
@@ -27,8 +28,7 @@ public:
 	template <typename U>
 	reverse_iterator& operator=(const reverse_iterator<U>& ref)
 	{
-		// if (this != &ref)
-			_iter = ref.base();
+		_iter = ref.base();
 		return (*this);
 	}
 
@@ -47,7 +47,7 @@ public:
 	reverse_iterator&	operator++()		{ --_iter; return (*this); }
 	reverse_iterator	operator++(int)		{ reverse_iterator	itr = (*this); --_iter; return (itr); }
 	reference			operator*()	const	{ iterator_type tmp = _iter; return *(--tmp); }
-	pointer				operator->()		{ return (&*_iter - 1); }
+	pointer				operator->()		{ return &(operator*()); }
 
 private:
 	iterator_type	_iter;
@@ -57,7 +57,7 @@ private:
 template <typename iter>
 	bool operator ==	(const reverse_iterator<iter>& lhs, const reverse_iterator<iter>& rhs) { return (lhs.base() == rhs.base()); }
 template <typename iter>
-	bool operator !=	(const reverse_iterator<iter>& lhs, const reverse_iterator<iter>& rhs) { return (lhs.base() == rhs.base()); }
+	bool operator !=	(const reverse_iterator<iter>& lhs, const reverse_iterator<iter>& rhs) { return (lhs.base() != rhs.base()); }
 template <typename iter>
 	bool operator <		(const reverse_iterator<iter>& lhs, const reverse_iterator<iter>& rhs) { return (lhs.base() > rhs.base()); }
 template <typename iter>
@@ -70,7 +70,7 @@ template <typename iter>
 template <typename iter1, typename iter2>
 	bool operator ==	(const reverse_iterator<iter1>& lhs, const reverse_iterator<iter2>& rhs) { return (lhs.base() == rhs.base()); }
 template <typename iter1, typename iter2>
-	bool operator !=	(const reverse_iterator<iter1>& lhs, const reverse_iterator<iter2>& rhs) { return (lhs.base() == rhs.base()); }
+	bool operator !=	(const reverse_iterator<iter1>& lhs, const reverse_iterator<iter2>& rhs) { return (lhs.base() != rhs.base()); }
 template <typename iter1, typename iter2>
 	bool operator <		(const reverse_iterator<iter1>& lhs, const reverse_iterator<iter2>& rhs) { return (lhs.base() > rhs.base()); }
 template <typename iter1, typename iter2>

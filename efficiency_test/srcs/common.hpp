@@ -4,7 +4,7 @@
 #include <map>
 #include <set>
 #include "vector.hpp"
-// #include "map.hpp"
+#include "map.hpp"
 // #include "set.hpp"
 
 void	efficiency_output(clock_t ft, clock_t std)

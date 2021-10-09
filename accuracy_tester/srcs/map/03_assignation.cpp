@@ -9,7 +9,6 @@ int	main()
 	lst.push_back(PAIR(2, "two"));
 	lst.push_back(PAIR(2, "two"));
 	lst.push_back(PAIR(4, "four"));
-
 	mapIntStr	map1(lst.begin(), lst.end());
 	lst.push_front(PAIR(0, "zero"));
 	mapIntStr	map2(lst.begin(), --lst.end());

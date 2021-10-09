@@ -19,7 +19,7 @@ fi
 CC="clang++"
 CFLAGS="-Wall -Wextra -Werror -std=c++98"
 
-if false; then
+if true; then
   CFLAGS+=" -fsanitize=address -g3";
 fi
 

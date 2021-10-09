@@ -147,21 +147,6 @@ template <class InputIterator1, class InputIterator2, class BinaryPredicate>
 	}
 
 
-template <class Arg1, class Arg2, class Result>
-	struct binary_function {
-		typedef	Arg1	first_argument_type;
-		typedef	Arg2	second_argument_type;
-		typedef	Result	result_type;
-	};
-
-/* less */
-template <class T>
-	struct less : binary_function <T, T, bool>
-	{
-		bool operator() (const T& x, const T& y) const { return x < y;}
-	};
-
-
 template< class T1, class T2 >
 struct pair
 {
@@ -173,8 +158,8 @@ struct pair
 
 	pair()
 	:
-		first(0),
-		second(0)
+		first(),
+		second()
 	{}
 template<class U, class V>
 	pair (const pair<U,V>& pr)
@@ -189,12 +174,13 @@ template<class U, class V>
 	{}
 	pair& operator=( const pair& other )
 	{
-		if (*this == other)
+		if (this == &other)
 			return (*this);
 		this->first = other.first;
 		this->second = other.second;
-		return	(*this);
+		return (*this);
 	}
+
 };
 
 template <class T1,class T2>
@@ -202,34 +188,49 @@ template <class T1,class T2>
 
 template <class T1, class T2>
 	bool operator== (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-	{ return lhs.first==rhs.first && lhs.second==rhs.second; }
+	{ return lhs.first == rhs.first && lhs.second == rhs.second; }
 
 template <class T1, class T2>
 	bool operator!= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-	{ return !(lhs==rhs); }
+	{ return !(lhs == rhs); }
 
 template <class T1, class T2>
 	bool operator<  (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-	{ return lhs.first<rhs.first || (!(rhs.first<lhs.first) && lhs.second<rhs.second); }
+	{ return lhs.first < rhs.first || (!(rhs.first < lhs.first) && lhs.second < rhs.second); }
 
 template <class T1, class T2>
 	bool operator<= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-	{ return !(rhs<lhs); }
+	{ return !(rhs < lhs); }
 
 template <class T1, class T2>
 	bool operator>  (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-	{ return rhs<lhs; }
+	{ return rhs < lhs; }
 
 template <class T1, class T2>
 	bool operator>= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-	{ return !(lhs<rhs); }
+	{ return !(lhs < rhs); }
+
+template <class Arg1, class Arg2, class Result>
+	struct binary_function {
+		typedef	Arg1	first_argument_type;
+		typedef	Arg2	second_argument_type;
+		typedef	Result	result_type;
+	};
+
+/* less */
+template <class T>
+	struct less : public binary_function <T, T, bool>
+	{
+		bool operator() (const T& x, const T& y) const { return (x < y);}
+	};
 
 
 /* red black tree node */
 enum Color
 {
+	RED,
 	BLACK,
-	RED
+	DBLACK
 };
 
 template<typename T>
@@ -254,25 +255,14 @@ public:
 		color(RED)
 	{}
 
-	// tree_node(tree_node* parent = my_nullptr,
-	// 			tree_node* left = my_nullptr,
-	// 			tree_node* right = my_nullptr)
-	// :
-	// 	value(),
-	// 	parent(parent),
-	// 	left(left),
-	// 	right(right),
-	// 	color(RED)
-	// {}
-
 	tree_node(const value_type& val, tree_node* parent = my_nullptr,
-				tree_node* left = my_nullptr, tree_node* right = my_nullptr)
+				tree_node* left = my_nullptr, tree_node* right = my_nullptr, color_type color = RED)
 	:
 		value(val),
 		parent(parent),
 		left(left),
 		right(right),
-		color(RED)
+		color(color)
 	{}
 
 	tree_node(const tree_node& other)
@@ -304,7 +294,22 @@ public:
 			return (true);
 		return (false);
 	}
+	bool operator!=(const tree_node& other)
+	{
+		if (this->value != other.value)
+			return (true);
+		return (false);
+	}
+
 };
+
+template <class T1, class T2>
+	bool operator== (const tree_node<T1>& lhs, const tree_node<T2>& rhs)
+	{ return lhs == rhs; }
+
+template <class T1, class T2>
+	bool operator!= (const tree_node<T1>& lhs, const tree_node<T2>& rhs)
+	{ return (lhs != rhs); }
 
 }
 
