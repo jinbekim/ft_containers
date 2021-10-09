@@ -114,11 +114,11 @@ template <class InputIterator>
 			++first;
 		}
 	}
-	void					erase (iterator position) { deleteValue(*position); }
+	void					erase (const_iterator position) { deleteValue(*position); }
 	size_type				erase (const value_type& k) { return (deleteValue(k)); }
-	void					erase (iterator first, iterator last)
+	void					erase (const_iterator first, const_iterator last)
 	{
-		for (iterator it = first; it != last; ) {
+		for (const_iterator it = first; it != last; ) {
 			erase(it++);
 		}
 	}
@@ -151,7 +151,7 @@ template <class InputIterator>
 	{
 		node_pointer	tmp = getRoot();
 		while (tmp != my_nullptr) {
-			if (tmp->value.first == k.first)
+			if (tmp->value == k)
 				break;
 			else if (_comp(tmp->value, k))
 				tmp = tmp->right;
@@ -169,7 +169,7 @@ template <class InputIterator>
 			return (0);
 		size_type	count = 0;
 		for (iterator it = tmp; it != end(); ++it) {
-			if (it->first == k.first)
+			if (*it == k)
 				++count;
 		}
 		return (count);
@@ -350,21 +350,21 @@ private:
 			if (grandparent == my_nullptr)
 				break;
 			node_pointer	uncle = getUncle(node);
-			if (getColor(uncle) == RED) { // 삼촌이 red인 경우, 반복.
+			if (getColor(uncle) == RED) { // case : 1, 2, 3
 				setColor(parent, BLACK);
 				setColor(uncle, BLACK);
 				setColor(grandparent, RED);
 				node = grandparent;
-			} else if (parent == grandparent->left) { // 삼촌이 black, 종료
-				if (node == parent->right) {
+			} else if (parent == grandparent->left) { // case : 2, 3
+				if (node == parent->right) { // case : 2
 					rotateLeft(parent);
 					node = parent;
-					parent = node->parent;
+					parent = getParent(node);
 				}
-				rotateRight(grandparent);
+				rotateRight(grandparent); // case: 3
 				std::swap(parent->color, grandparent->color);
 				node = parent;
-			} else if (parent == grandparent->right) { // 삼촌이 black, 종료
+			} else if (parent == grandparent->right) { // 반대 방향
 				if (node == parent->left) {
 					rotateRight(parent);
 					node = parent;
@@ -419,35 +419,35 @@ private:
 			setColor(tmp, DBLACK);
 			while (tmp != getRoot() && getColor(tmp) == DBLACK) {
 				p = tmp->parent;
-				if (tmp == p->left) {
+				if (tmp == p->left) { //case : 1, 2, 3, 4
 					s = p->right;
-					if (getColor(s) == RED) {
+					if (getColor(s) == RED) { // case : 1
 						setColor(s, BLACK);
 						setColor(p, RED);
 						rotateLeft(p);
-					} else {
-						if (getColor(s->left) == BLACK && getColor(s->right) == BLACK) {
+					} else { // s == BLACK, case: 2,3,4
+						if (getColor(s->left) == BLACK && getColor(s->right) == BLACK) { // case : 2
 							setColor(s, RED);
 							if (getColor(p) == RED)
 								setColor(p, BLACK);
 							else
 								setColor(p, DBLACK);
 							tmp = p;
-						} else {
-							if (getColor(s->right) == BLACK) {
+						} else { // case : 3, 4
+							if (getColor(s->right) == BLACK) { // case: 3 s->left == RED
 								setColor(s->left, BLACK);
 								setColor(s, RED);
 								rotateRight(s);
 								s = p->right;
 							}
-							setColor(s, getColor(p));
+							setColor(s, getColor(p)); // case: 4 s->right == RED
 							setColor(p, BLACK);
 							setColor(s->right, BLACK);
 							rotateLeft(p);
 							break;
 						}
 					}
-				} else {
+				} else { //case : 5, 6, 7, 8 ( 반대 방향)
 					s = p->left;
 					if (getColor(s) == RED) {
 						setColor(s, BLACK);
@@ -530,10 +530,9 @@ private:
 			node->right = tmp2;
 			std::swap(tmp->color, node->color);
 		}
-		// if (node == getRoot())
-		// 	setRoot(tmp);
 		return deleteNode(tmp->right, val);
 	}
+
 };
 
 }

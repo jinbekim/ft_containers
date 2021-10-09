@@ -181,7 +181,7 @@ template <class InputIterator>
 private:
 	key_compare									_comp;
 	allocator_type								_alloc;
-	red_black_tree<value_type, value_compare>	_tree;
+	red_black_tree<value_type, value_compare, allocator_type>	_tree;
 
 };
 template <class Key, class T, class Compare, class Alloc>

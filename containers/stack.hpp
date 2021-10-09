@@ -37,13 +37,17 @@ protected:
 	container_type	c;
 
 template <class Tn, class Containern>
-	friend bool operator== (const stack<Tn,Containern>& lhs, const stack<Tn,Containern>& rhs) { return (lhs.c == rhs.c); }
+	friend bool operator== (const stack<Tn,Containern>& lhs, const stack<Tn,Containern>& rhs);
 template <class Tn, class Containern>
-	friend bool operator<  (const stack<Tn,Containern>& lhs, const stack<Tn,Containern>& rhs) { return (lhs.c < rhs.c); }
+	friend bool operator<  (const stack<Tn,Containern>& lhs, const stack<Tn,Containern>& rhs);
 
 };
 
 
+template <class Tn, class Containern>
+	bool operator== (const stack<Tn,Containern>& lhs, const stack<Tn,Containern>& rhs) { return (lhs.c == rhs.c); }
+template <class Tn, class Containern>
+	bool operator<  (const stack<Tn,Containern>& lhs, const stack<Tn,Containern>& rhs) { return (lhs.c < rhs.c); }
 template <class Tn, class Containern>
 	bool operator!= (const stack<Tn,Containern>& lhs, const stack<Tn,Containern>& rhs) { return !(lhs == rhs); }
 template <class Tn, class Containern>

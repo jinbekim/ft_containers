@@ -309,7 +309,7 @@ template <class InputIterator>
 	}
 	void swap (vector& x)
 	{
-		if (x == *this)
+		if (&x == this)
 			return;
 		pointer	tmp_start = x._start;
 		pointer	tmp_end = x._end;
