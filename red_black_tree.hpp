@@ -151,7 +151,7 @@ template <class InputIterator>
 	{
 		node_pointer	tmp = getRoot();
 		while (tmp != my_nullptr) {
-			if (tmp->value == k)
+			if (!_comp(tmp->value, k) && !_comp(k, tmp->value))
 				break;
 			else if (_comp(tmp->value, k))
 				tmp = tmp->right;
@@ -169,7 +169,7 @@ template <class InputIterator>
 			return (0);
 		size_type	count = 0;
 		for (iterator it = tmp; it != end(); ++it) {
-			if (*it == k)
+			if (!_comp(*it, k) && !_comp(k, *it))
 				++count;
 		}
 		return (count);
