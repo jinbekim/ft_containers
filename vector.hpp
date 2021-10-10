@@ -252,9 +252,7 @@ template <class InputIterator>
 			_alloc.construct(new_start + pos + i, val);
 		for (size_type i = 0; i < this->size() - pos; ++i)
 			_alloc.construct(new_start + pos + n + i, *(_start + pos + i));
-		for (size_type i = 0; i < this->size() - pos; ++i)
-			_alloc.destroy(_start + pos + i);
-		for (size_type i = 0; i < pos; ++i)
+		for (size_type i = 0; i < this->size(); ++i)
 			_alloc.destroy(_start + i);
 		_alloc.deallocate(_start, prev_capa);
 		_end = new_start + n + this->size();
@@ -287,10 +285,8 @@ template <class InputIterator>
 			_alloc.construct(new_start + pos + i, *(&*first++));
 		for (size_type i = 0; i < this->size() - pos; ++i)
 			_alloc.construct(new_start + pos + num + i, *(_start + pos + i));
-		for (size_type i = 0; i < pos; ++i)
+		for (size_type i = 0; i < this->size(); ++i)
 			_alloc.destroy(_start + i);
-		for (size_type i = 0; i < this->size() - pos; ++i)
-			_alloc.destroy(_start + pos + i);
 		_alloc.deallocate(_start, prev_capa);
 		_end = new_start + num + this->size();
 		_start = new_start;
@@ -373,7 +369,7 @@ template <class T, class Alloc>
 		return ft::lexicographical_compare(lhs.begin(), lhs.end(),rhs.begin(), rhs.end());
 	}
 template <class T, class Alloc>
-	bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) { return !(lhs < rhs); }
+	bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) { return !(rhs < lhs); }
 template <class T, class Alloc>
 	bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) { return (rhs < lhs); }
 template <class T, class Alloc>

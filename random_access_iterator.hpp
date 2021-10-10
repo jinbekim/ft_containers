@@ -33,18 +33,20 @@ public:
 	pointer						base() const { return (this->_ptr); }
 
 	random_access_iterator&		operator+=(difference_type	n) { _ptr += n; return (*this); }
-	random_access_iterator		operator+(difference_type	n) { random_access_iterator itr = (*this); return (itr += n); }
+	random_access_iterator		operator+(difference_type	n) const { random_access_iterator itr = (*this); return (itr += n); }
 	random_access_iterator&		operator-=(difference_type	n) { _ptr -= n; return (*this); }
-	random_access_iterator		operator-(difference_type	n) { random_access_iterator itr = (*this); return (itr -= n); }
+	random_access_iterator		operator-(difference_type	n) const { random_access_iterator itr = (*this); return (itr -= n); }
 	reference					operator[](difference_type	n) { return (_ptr[n]); }
+	const reference				operator[](difference_type	n) const { return (_ptr[n]); }
 
 	template<typename U>
 	random_access_iterator&		operator=(random_access_iterator<U>	other) { this->_ptr = other.base(); return (*this); }
 	random_access_iterator&		operator--()		{ --_ptr; return (*this); }
-	random_access_iterator		operator--(int)		{ random_access_iterator	itr = (*this); --_ptr; return (itr); }
+	random_access_iterator		operator--(int)		{ random_access_iterator itr = (*this); --_ptr; return (itr); }
 	random_access_iterator&		operator++()		{ ++_ptr; return (*this); }
-	random_access_iterator		operator++(int)		{ random_access_iterator	itr = (*this); ++_ptr; return (itr); }
-	reference					operator*()	const	{ return (*_ptr); }
+	random_access_iterator		operator++(int)		{ random_access_iterator itr = (*this); ++_ptr; return (itr); }
+	reference					operator*()			{ return (*_ptr); }
+	const reference				operator*()	const	{ return (*_ptr); }
 	pointer						operator->()		{ return (_ptr); }
 
 	operator random_access_iterator<const T> () const { return (random_access_iterator<const T>(this->_ptr)); }
