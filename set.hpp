@@ -107,7 +107,7 @@ template <class InputIterator>
 	key_compare				key_comp() const { return (key_compare()); }
 	value_compare			value_comp() const { return (value_compare()); }
 // Operations:
-	iterator				find (const value_type& k) { return (_tree.find(k)); }
+	iterator				find (const value_type& k) const { return (_tree.find(k)); }
 	size_type				count (const value_type& k) const { return (_tree.count(k)); }
 	iterator				lower_bound (const value_type& k) const
 	{

@@ -238,26 +238,27 @@ template <class InputIterator>
 		pointer		new_start = my_nullptr;
 		if (this->max_size() < nec_size)
 			throw (std::length_error("vector::insert (fill)"));
-		if (this->capacity() * 2 < nec_size)
+		if (this->capacity() * 2 < nec_size) {
 			new_start = _alloc.allocate(nec_size);
-		else
-			new_start = _alloc.allocate(this->capacity() * 2);
-		for (size_type i = 0; i < pos; ++i)
-		{
-			_alloc.construct(new_start, *(_start + i));
-			_alloc.destroy(_start + i);
+			_end_capa = new_start + nec_size;
 		}
+		else {
+			new_start = _alloc.allocate(this->capacity() * 2);
+			_end_capa = new_start + this->capacity() * 2;
+		}
+		for (size_type i = 0; i < pos; ++i)
+			_alloc.construct(new_start + i, *(_start + i));
 		for (size_type i = 0; i < n; ++i)
 			_alloc.construct(new_start + pos + i, val);
 		for (size_type i = 0; i < this->size() - pos; ++i)
-		{
 			_alloc.construct(new_start + pos + n + i, *(_start + pos + i));
+		for (size_type i = 0; i < this->size() - pos; ++i)
 			_alloc.destroy(_start + pos + i);
-		}
+		for (size_type i = 0; i < pos; ++i)
+			_alloc.destroy(_start + i);
 		_alloc.deallocate(_start, prev_capa);
 		_end = new_start + n + this->size();
 		_start = new_start;
-		_end_capa = _start + prev_capa;
 	}
 template <class InputIterator>
 	void insert (iterator position, InputIterator first, InputIterator last,
@@ -272,26 +273,27 @@ template <class InputIterator>
 		pointer		new_start = my_nullptr;
 		if (this->max_size() < nec_size)
 			throw (std::length_error("vector::insert (range)"));
-		if (this->capacity() * 2 < nec_size)
+		if (this->capacity() * 2 < nec_size) {
 			new_start = _alloc.allocate(nec_size);
-		else
-			new_start = _alloc.allocate(this->capacity() * 2);
-		for (size_type i = 0; i < pos; ++i)
-		{
-			_alloc.construct(new_start, *(_start + i));
-			_alloc.destroy(_start + i);
+			_end_capa = new_start + nec_size;
 		}
+		else {
+			new_start = _alloc.allocate(this->capacity() * 2);
+			_end_capa = new_start + this->capacity() * 2;
+		}
+		for (size_type i = 0; i < pos; ++i)
+			_alloc.construct(new_start + i, *(_start + i));
 		for (size_type i = 0; i < num; ++i)
 			_alloc.construct(new_start + pos + i, *(&*first++));
 		for (size_type i = 0; i < this->size() - pos; ++i)
-		{
 			_alloc.construct(new_start + pos + num + i, *(_start + pos + i));
+		for (size_type i = 0; i < pos; ++i)
+			_alloc.destroy(_start + i);
+		for (size_type i = 0; i < this->size() - pos; ++i)
 			_alloc.destroy(_start + pos + i);
-		}
 		_alloc.deallocate(_start, prev_capa);
 		_end = new_start + num + this->size();
 		_start = new_start;
-		_end_capa = _start + prev_capa;
 	}
 	iterator erase( iterator pos ) { return erase(pos, pos + 1); }
 	iterator erase( iterator first, iterator last )
@@ -368,7 +370,7 @@ template <class T, class Alloc>
 template <class T, class Alloc>
 	bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
-		return ft::lexicographical_compare(lhs.begin(), rhs.begin(), lhs.end(), rhs.end());
+		return ft::lexicographical_compare(lhs.begin(), lhs.end(),rhs.begin(), rhs.end());
 	}
 template <class T, class Alloc>
 	bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) { return !(lhs < rhs); }

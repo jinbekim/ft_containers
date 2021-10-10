@@ -55,12 +55,15 @@ private:
 };
 template<typename T>
 	random_access_iterator<T>
-		operator +	(typename random_access_iterator<T>::diffence_type n, const random_access_iterator<T>& iterator)
+		operator +	(typename random_access_iterator<T>::difference_type n, const random_access_iterator<T>& iterator)
 		{ random_access_iterator<T> itr = iterator; return (itr + n); }
 
 template<typename iter>
 	typename ft::random_access_iterator<iter>::difference_type
 		operator -	(const random_access_iterator<iter>& lhs, const random_access_iterator<iter>& rhs) { return (lhs.base() - rhs.base()); }
+template<typename iter1, typename iter2>
+	typename ft::random_access_iterator<iter1>::difference_type
+		operator -	(const random_access_iterator<iter1>& lhs, const random_access_iterator<iter2>& rhs) { return (lhs.base() - rhs.base()); }
 
 template<typename iter>
 	bool	operator ==	(const random_access_iterator<iter>& lhs, const random_access_iterator<iter>& rhs) { return (lhs.base() == rhs.base()); }
@@ -87,6 +90,7 @@ template<typename iter1, typename iter2>
 	bool	operator <=	(const random_access_iterator<iter1>& lhs, const random_access_iterator<iter2>& rhs) { return !(rhs < lhs); }
 template<typename iter1, typename iter2>
 	bool	operator >=	(const random_access_iterator<iter1>& lhs, const random_access_iterator<iter2>& rhs) { return !(lhs < rhs); }
+
 
 }
 

@@ -11,7 +11,7 @@ else
   NAMESPACE=$2
 fi
 if [ -z "$3" ]; then
-  INCLUDE_PATH="../containers -I../utils";
+  INCLUDE_PATH="../";
 else
   INCLUDE_PATH="$3"
 fi

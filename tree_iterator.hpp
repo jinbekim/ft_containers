@@ -73,7 +73,7 @@ public:
 	tree_iterator		operator++(int)		{ tree_iterator	tmp = (*this); ++(*this); return (tmp); }
 	tree_iterator		operator--(int)		{ tree_iterator	tmp = (*this); --(*this); return (tmp); }
 	reference			operator*()	const	{ return (_node->value); }
-	pointer				operator->()		{ return (&(_node->value)); }
+	pointer				operator->()	const	{ return (&(_node->value)); }
 	bool				operator ==	(const tree_iterator& lhs) { return (this->_node == lhs._node); }
 	bool				operator !=	(const tree_iterator& lhs) { return (this->_node != lhs._node); }
 	bool				operator ==	(const tree_const_iterator<T>& lhs) { return (this->base() == lhs.base()); }
@@ -169,7 +169,7 @@ public:
 	tree_const_iterator		operator++(int)		{ tree_const_iterator	itr = (*this); ++(*this); return (itr); }
 	tree_const_iterator		operator--(int)		{ tree_const_iterator	itr = (*this); --(*this); return (itr); }
 	reference			operator*()	const	{ return (_node->value); }
-	pointer				operator->()		{ return (&(_node->value)); }
+	pointer				operator->() const	{ return (&(_node->value)); }
 	bool				operator ==	(const tree_const_iterator& lhs) { return (this->_node == lhs._node); }
 	bool				operator !=	(const tree_const_iterator& lhs) { return (this->_node != lhs._node); }
 	bool				operator ==	(const tree_iterator<T>& lhs) { return (this->base() == lhs.base()); }

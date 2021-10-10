@@ -47,7 +47,7 @@ public:
 	reverse_iterator&	operator++()		{ --_iter; return (*this); }
 	reverse_iterator	operator++(int)		{ reverse_iterator	itr = (*this); --_iter; return (itr); }
 	reference			operator*()	const	{ iterator_type tmp = _iter; return *(--tmp); }
-	pointer				operator->()		{ return &(operator*()); }
+	pointer				operator->() const	{ return &(operator*()); }
 
 private:
 	iterator_type	_iter;

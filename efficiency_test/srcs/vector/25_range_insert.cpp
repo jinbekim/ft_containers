@@ -11,12 +11,12 @@ int main()
 
 		ft::vector<std::string>	itvec1(100, "string");
 		t = clock();
-		for (int i = 0; i < 100; ++i)
+		for (int i = 0; i < 10; ++i)
 			itvec1.insert(itvec1.begin(), range.begin(), range.end());
 		ft_time = clock() - t;
 		std::vector<std::string>	itvec2(100, "string");
 		t = clock();
-		for (int i = 0; i < 100; ++i)
+		for (int i = 0; i < 10; ++i)
 			itvec2.insert(itvec2.begin(), range.begin(), range.end());
 		std_time = clock() - t;
 		efficiency_output(ft_time, std_time);
