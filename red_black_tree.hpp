@@ -340,9 +340,40 @@ private:
 		}
 		return (ft::make_pair(iterator(node), true));
 	}
+	void	insertCase1(node_pointer& node)
+	{
+		setColor(getParent(node), BLACK);
+		setColor(getUncle(node), BLACK);
+		setColor(getGrandparent(node), RED);
+		node = getGrandparent(node);
+	}
+	void	insertCase2(node_pointer& node, node_pointer& p)
+	{
+		if (p == getGrandparent(node)->left) {
+			rotateLeft(p);
+			node = p;
+			p = getParent(node);
+		}
+		if (p == getGrandparent(node)->right) {
+			rotateRight(p);
+			node = p;
+			p = getParent(node);
+		}
+	}
+	void	insertCase3(node_pointer& node, node_pointer p, node_pointer g)
+	{
+		if (p == g->left)
+			rotateRight(g);
+		if (p == g->right)
+			rotateLeft(g);
+		std::swap(p->color, g->color);
+		node = p;
+	}
+
 	void	fixAfterInsert(node_pointer node)
 	{
 		node_pointer	parent, grandparent;
+
 		while (node != getRoot() && getColor(node) == RED && getColor(getParent(node)) == RED)
 		{
 			parent = getParent(node);
@@ -350,29 +381,16 @@ private:
 			if (grandparent == my_nullptr)
 				break;
 			node_pointer	uncle = getUncle(node);
-			if (getColor(uncle) == RED) { // case : 1, 2, 3
-				setColor(parent, BLACK);
-				setColor(uncle, BLACK);
-				setColor(grandparent, RED);
-				node = grandparent;
-			} else if (parent == grandparent->left) { // case : 2, 3
-				if (node == parent->right) { // case : 2
-					rotateLeft(parent);
-					node = parent;
-					parent = getParent(node);
-				}
-				rotateRight(grandparent); // case: 3
-				std::swap(parent->color, grandparent->color);
-				node = parent;
-			} else if (parent == grandparent->right) { // 반대 방향
-				if (node == parent->left) {
-					rotateRight(parent);
-					node = parent;
-					parent = getParent(node);
-				}
-				rotateLeft(grandparent);
-				std::swap(parent->color, grandparent->color);
-				node = parent;
+			if (getColor(uncle) == RED) {
+				insertCase1(node);
+			} else if (parent == grandparent->left) {
+				if (node == parent->right)
+					insertCase2(node, parent);
+				insertCase3(node, parent, grandparent);
+			} else if (parent == grandparent->right) {
+				if (node == parent->left)
+					insertCase2(node, parent);
+				insertCase3(node, parent, grandparent);
 			}
 		}
 		setColor(getRoot(), BLACK);
@@ -387,104 +405,119 @@ private:
 		this->_size--;
 		return (1);
 	}
+
+	void	deleteRedCase(node_pointer& node)
+	{
+		node_pointer child = node->left != my_nullptr ? node->left : node->right;
+		if (node == node->parent->left)
+			node->parent->left = child;
+		else
+			node->parent->right = child;
+		if (child != my_nullptr)
+			child->parent = node->parent;
+		setColor(child, BLACK);
+		_node_alloc.destroy(node);
+		_node_alloc.deallocate(node, 1);
+	}
+	void	deleteRootCase(node_pointer root)
+	{
+		if (root->right)
+			setRoot(root->right);
+		else
+			setRoot(root->left);
+		_node_alloc.destroy(root);
+		_node_alloc.deallocate(root, 1);
+		setColor(getRoot(), BLACK);
+		return;
+
+	}
+	void	deleteCase1(node_pointer& s, node_pointer& p)
+	{
+		setColor(s, BLACK);
+		setColor(p, RED);
+		if (s == p->right)
+			rotateLeft(p);
+		if (s == p->left)
+			rotateRight(p);
+	}
+	void	deleteCase2(node_pointer s, node_pointer p, node_pointer& node)
+	{
+		setColor(s, RED);
+		if (getColor(p) == RED)
+			setColor(p, BLACK);
+		else
+			setColor(p, DBLACK);
+		node = p;
+	}
+	void	deleteCase3(node_pointer& s, node_pointer& p)
+	{
+		if (s == p->right) {
+			setColor(s->left, BLACK);
+			setColor(s, RED);
+			rotateRight(s);
+			s = p->right;
+		}
+		if (s == p->left) {
+			setColor(s->right, BLACK);
+			setColor(s, RED);
+			rotateLeft(s);
+			s = p->left;
+		}
+
+	}
+	void	deleteCase4(node_pointer& s, node_pointer& p)
+	{
+		if (s == p->right) {
+			setColor(s, getColor(p));
+			setColor(p, BLACK);
+			setColor(s->right, BLACK);
+			rotateLeft(p);
+		}
+		if (s == p->left) {
+			setColor(s, getColor(p));
+			setColor(p, BLACK);
+			setColor(s->left, BLACK);
+			rotateRight(p);
+		}
+	}
 	void	fixAfterDelete(node_pointer node)
 	{
 		if (node == my_nullptr)
 			return;
 		if (node == getRoot()) {
-			if (node->right)
-				setRoot(node->right);
-			else
-				setRoot(node->left);
-			_node_alloc.destroy(node);
-			_node_alloc.deallocate(node, 1);
-			setColor(getRoot(), BLACK);
+			deleteRootCase(node);
 			return;
 		}
 		if (getColor(node) == RED || getColor(node->left) == RED|| getColor(node->right) == RED) {
-			node_pointer child = node->left != my_nullptr ? node->left : node->right;
-			if (node == node->parent->left)
-				node->parent->left = child;
-			else
-				node->parent->right = child;
-			if (child != my_nullptr)
-				child->parent = node->parent;
-			setColor(child, BLACK);
-			_node_alloc.destroy(node);
-			_node_alloc.deallocate(node, 1);
-		} else {
-			node_pointer s = my_nullptr;
-			node_pointer p = my_nullptr;
-			node_pointer tmp = node;
-			setColor(tmp, DBLACK);
-			while (tmp != getRoot() && getColor(tmp) == DBLACK) {
-				p = tmp->parent;
-				if (tmp == p->left) { //case : 1, 2, 3, 4
-					s = p->right;
-					if (getColor(s) == RED) { // case : 1
-						setColor(s, BLACK);
-						setColor(p, RED);
-						rotateLeft(p);
-					} else { // s == BLACK, case: 2,3,4
-						if (getColor(s->left) == BLACK && getColor(s->right) == BLACK) { // case : 2
-							setColor(s, RED);
-							if (getColor(p) == RED)
-								setColor(p, BLACK);
-							else
-								setColor(p, DBLACK);
-							tmp = p;
-						} else { // case : 3, 4
-							if (getColor(s->right) == BLACK) { // case: 3 s->left == RED
-								setColor(s->left, BLACK);
-								setColor(s, RED);
-								rotateRight(s);
-								s = p->right;
-							}
-							setColor(s, getColor(p)); // case: 4 s->right == RED
-							setColor(p, BLACK);
-							setColor(s->right, BLACK);
-							rotateLeft(p);
-							break;
-						}
-					}
-				} else { //case : 5, 6, 7, 8 ( 반대 방향)
-					s = p->left;
-					if (getColor(s) == RED) {
-						setColor(s, BLACK);
-						setColor(p, RED);
-						rotateRight(p);
-					} else {
-						if (getColor(s->left) == BLACK && getColor(s->right) == BLACK) {
-							setColor(s, RED);
-							if (getColor(p) == RED)
-								setColor(p, BLACK);
-							else
-								setColor(p, DBLACK);
-							tmp = p;
-						} else {
-							if (getColor(s->left) == BLACK) {
-								setColor(s->right, BLACK);
-								setColor(s, RED);
-								rotateLeft(s);
-								s = p->left;
-							}
-							setColor(s, getColor(p));
-							setColor(p, BLACK);
-							setColor(s->left, BLACK);
-							rotateRight(p);
-							break;
-						}
-					}
-				}
-			}
-			if (node == node->parent->left)
-				node->parent->left = my_nullptr;
-			else
-				node->parent->right = my_nullptr;
-			_node_alloc.destroy(node);
-			_node_alloc.deallocate(node, 1);
-			setColor(getRoot(), BLACK);
+			deleteRedCase(node);
+			return;
 		}
+		node_pointer s = my_nullptr;
+		node_pointer p = my_nullptr;
+		node_pointer tmp = node;
+		setColor(tmp, DBLACK);
+		while (tmp != getRoot() && getColor(tmp) == DBLACK) {
+			p = tmp->parent;
+			s = (tmp == p->left) ? p->right : p->left;
+			if (getColor(s) == RED)
+				deleteCase1(s, p);
+			else if (getColor(s->left) == BLACK && getColor(s->right) == BLACK)
+				deleteCase2(s, p, tmp);
+			else {
+				if ((tmp == p->left && getColor(s->right) == BLACK)
+				|| (tmp == p->right && getColor(s->left) == BLACK))
+					deleteCase3(s, p);
+				deleteCase4(s, p);
+				break;
+			}
+		}
+		if (node == node->parent->left)
+			node->parent->left = my_nullptr;
+		else
+			node->parent->right = my_nullptr;
+		_node_alloc.destroy(node);
+		_node_alloc.deallocate(node, 1);
+		setColor(getRoot(), BLACK);
 	}
 	node_pointer	deleteNode(node_pointer node, const value_type& val) {
 		if (node == my_nullptr)
