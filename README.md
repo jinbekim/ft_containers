@@ -1,7 +1,7 @@
 # ft_containers
 
 ## *Summary*:
-Re-implement C++ containers.
+Re-code C++ containers.
 
 ## *Period*:
 2021.10 ~ 2021.10
